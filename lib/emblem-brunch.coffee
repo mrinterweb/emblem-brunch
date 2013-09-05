@@ -37,10 +37,18 @@ module.exports = class EmblemCompiler
           .replace(/^templates\//, '')
           .replace(/\.\w+$/, '')
         content = @window.Emblem.precompile @window.Ember.Handlebars, data
-        result = "Ember.TEMPLATES[#{JSON.stringify(path)}] = Ember.Handlebars.template(#{content});module.exports = module.id;"
+        result = "Ember.TEMPLATES[#{JSON.stringify(path)}] = Ember.Handlebars.template(#{content});"
+        switch @config.modules.wrapper
+          when 'commonjs'
+            result = "#{result}module.exports = module.id;"
+        result
       else
         content = @window.Emblem.precompile @window.Handlebars, data
-        result = "module.exports = Handlebars.template(#{content});"
+        result = "Handlebars.template(#{content});"
+        switch @config.modules.wrapper
+          when 'commonjs'
+            result = "module.exports = #{result}"
+        result
     catch err
       error = err
     finally
